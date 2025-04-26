@@ -32,11 +32,11 @@ const server = new McpServer({
 });
 
 // Get API key
-const apiKey = getApiKey();
-if (!apiKey) {
-  console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
-  process.exit(1);
-}
+const apiKey = getApiKey() || "dddc5b23b5bae0a87ca800c20d336022";
+// if (!apiKey) {
+//   console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
+//   process.exit(1);
+// }
 
 // At this point, we know apiKey is not null
 const validApiKey = apiKey as string;
@@ -113,10 +113,10 @@ server.resource(
 
 // Tournament details resource
 server.resource(
-  "tournament",
-  new ResourceTemplate("limitless://tournament/{id}", { list: undefined }),
+  "tournament-details",
+  new ResourceTemplate("limitless://tournament/{id}/details", { list: undefined }),
   async (uri, { id }) => {
-    const tournament = await limitlessRequest(`tournaments/${id}`);
+    const tournament = await limitlessRequest(`tournaments/${id}/details`);
     
     return {
       contents: [{
@@ -152,44 +152,64 @@ server.resource(
 );
 
 // Tournament decklists resource
+// server.resource(
+//   "tournament-decklists",
+//   new ResourceTemplate("limitless://tournament/{id}/decklists", { list: undefined }),
+//   async (uri, { id }) => {
+//     const decklists = await limitlessRequest(`tournaments/${id}/decklists`);
+    
+//     return {
+//       contents: [{
+//         uri: uri.href,
+//         metadata: {
+//           title: "Tournament Decklists",
+//           description: `Decklists for tournament ID ${id}`
+//         },
+//         text: JSON.stringify(decklists, null, 2)
+//       }]
+//     };
+//   }
+// );
+
+// Tournament pairings resource
 server.resource(
-  "tournament-decklists",
-  new ResourceTemplate("limitless://tournament/{id}/decklists", { list: undefined }),
+  "tournament-pairings",
+  new ResourceTemplate("limitless://tournament/{id}/pairings", { list: undefined }),
   async (uri, { id }) => {
-    const decklists = await limitlessRequest(`tournaments/${id}/decklists`);
+    const pairings = await limitlessRequest(`tournaments/${id}/pairings`);
     
     return {
       contents: [{
         uri: uri.href,
         metadata: {
-          title: "Tournament Decklists",
-          description: `Decklists for tournament ID ${id}`
+          title: "Tournament Pairings",
+          description: `Match pairings for tournament ID ${id}`
         },
-        text: JSON.stringify(decklists, null, 2)
+        text: JSON.stringify(pairings, null, 2)
       }]
     };
   }
 );
 
 // Single decklist resource
-server.resource(
-  "decklist",
-  new ResourceTemplate("limitless://decklist/{id}", { list: undefined }),
-  async (uri, { id }) => {
-    const decklist = await limitlessRequest(`decklists/${id}`);
+// server.resource(
+//   "decklist",
+//   new ResourceTemplate("limitless://decklist/{id}", { list: undefined }),
+//   async (uri, { id }) => {
+//     const decklist = await limitlessRequest(`decklists/${id}`);
     
-    return {
-      contents: [{
-        uri: uri.href,
-        metadata: {
-          title: `Decklist: ${decklist.player?.name || id}`,
-          description: `Decklist details for ID ${id}`
-        },
-        text: JSON.stringify(decklist, null, 2)
-      }]
-    };
-  }
-);
+//     return {
+//       contents: [{
+//         uri: uri.href,
+//         metadata: {
+//           title: `Decklist: ${decklist.player?.name || id}`,
+//           description: `Decklist details for ID ${id}`
+//         },
+//         text: JSON.stringify(decklist, null, 2)
+//       }]
+//     };
+//   }
+// );
 
 // Start receiving messages on stdin and sending messages on stdout
 const transport = new StdioServerTransport();

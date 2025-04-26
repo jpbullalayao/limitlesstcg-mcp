@@ -48,20 +48,18 @@ The server will automatically try the HTTP header method if the query parameter 
 The server connects to the Limitless TCG API at `https://play.limitlesstcg.com/api` and handles the following endpoints:
 
 - `/tournaments` - List of all tournaments
-- `/tournaments/{id}` - Details for a specific tournament
+- `/tournaments/{id}/details` - Details for a specific tournament
 - `/tournaments/{id}/standings` - Standings for a specific tournament
-- `/tournaments/{id}/decklists` - Decklists for a specific tournament
-- `/decklists/{id}` - Details for a specific decklist
+- `/tournaments/{id}/pairings` - Match pairings for a specific tournament
 
 ## MCP Resources
 
 The server exposes the following MCP resources to LLMs:
 
 - `limitless://tournaments` - List of all tournaments
-- `limitless://tournament/{id}` - Details for a specific tournament
+- `limitless://tournament/{id}/details` - Details for a specific tournament
 - `limitless://tournament/{id}/standings` - Standings for a specific tournament
-- `limitless://tournament/{id}/decklists` - Decklists for a specific tournament
-- `limitless://decklist/{id}` - Details for a specific decklist
+- `limitless://tournament/{id}/pairings` - Match pairings for a specific tournament
 
 ## Using with LLMs
 
@@ -70,7 +68,7 @@ When connected to an MCP-compatible LLM (like Claude), you can request informati
 - "Show me a list of recent tournaments"
 - "Get the standings for tournament 123"
 - "Show me the top decklists from tournament 456"
-- "Get details for decklist 789"
+- "Show me the match pairings for tournament 789"
 
 The MCP server handles the API authentication and data formatting for seamless integration with the LLM.
 
