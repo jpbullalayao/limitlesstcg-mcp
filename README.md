@@ -56,19 +56,42 @@ The server connects to the Limitless TCG API at `https://play.limitlesstcg.com/a
 
 The server exposes the following MCP resources to LLMs:
 
-- `limitless://tournaments` - List of all tournaments
+- `limitless://tournaments{?game,format,organizerId,limit,page}` - List of tournaments
+
+  - `game`: Game ID, e.g. PTCG, VGC
+  - `format`: Format ID
+  - `organizerId`: Organization ID for a specific organizer's tournaments
+  - `limit`: Number of tournaments to be returned (default: 50)
+  - `page`: Used for pagination
+
 - `limitless://tournament/{id}/details` - Details for a specific tournament
+
 - `limitless://tournament/{id}/standings` - Standings for a specific tournament
+
 - `limitless://tournament/{id}/pairings` - Match pairings for a specific tournament
 
 ## Using with LLMs
 
-When connected to an MCP-compatible LLM (like Claude), you can request information about tournaments and decklists:
+When connected to an MCP-compatible LLM (like Claude), you can request information about tournaments with specific parameters:
 
-- "Show me a list of recent tournaments"
+- "Show me a list of Pokémon TCG tournaments, limited to 10 results"
 - "Get the standings for tournament 123"
-- "Show me the top decklists from tournament 456"
-- "Show me the match pairings for tournament 789"
+- "Show me the pairings for tournament 456"
+
+Examples of how LLMs can use query parameters for tournaments:
+
+```
+To get Pokémon TCG tournaments:
+limitless://tournaments?game=PTCG
+
+To get STANDARD format tournaments with a limit of 10:
+limitless://tournaments?format=STANDARD&limit=10
+
+To access tournament details, standings, or pairings:
+limitless://tournament/123/details
+limitless://tournament/123/standings
+limitless://tournament/123/pairings
+```
 
 The MCP server handles the API authentication and data formatting for seamless integration with the LLM.
 

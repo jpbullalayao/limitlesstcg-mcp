@@ -94,15 +94,31 @@ async function limitlessRequest(endpoint: string, params: Record<string, unknown
 // Tournament list resource
 server.resource(
   "tournaments",
-  new ResourceTemplate("limitless://tournaments", { list: undefined }),
-  async (uri) => {
-    const tournaments = await limitlessRequest("tournaments");
+  new ResourceTemplate("limitless://tournaments{?game,format,organizerId,limit,page}", { list: undefined }),
+  async (uri, { game, format, organizerId, limit, page }) => {
+    // Prepare query parameters for the API request
+    const params: Record<string, unknown> = {};
+    if (game) params.game = game;
+    if (format) params.format = format;
+    if (organizerId) params.organizerId = organizerId;
+    if (limit) params.limit = limit;
+    if (page) params.page = page;
+    
+    const tournaments = await limitlessRequest("tournaments", params);
+    
+    // Construct the title based on the query parameters
+    let title = "Limitless Tournaments";
+    if (game) title += ` - ${game}`;
+    if (format) title += ` (${format} format)`;
+    if (organizerId) title += ` by organizer ${organizerId}`;
+    if (limit) title += ` (limited to ${limit})`;
+    if (page) title += ` - Page ${page}`;
     
     return {
       contents: [{
         uri: uri.href,
         metadata: {
-          title: "Limitless TCG Tournaments",
+          title,
           description: "List of tournaments from Limitless TCG"
         },
         text: JSON.stringify(tournaments, null, 2)
