@@ -92,11 +92,11 @@ async function limitlessRequest(endpoint: string, params: Record<string, unknown
   }
 }
 
-const GAME_ENUM = z.enum(['DBS', 'FW', 'POCKET', 'VGC', 'LORCANA', 'BSS', 'OP', 'SWU', 'PGO', 'GUNDAM', 'DCG', 'other', 'PTCG']);
+const GAMES = ['DBS', 'FW', 'POCKET', 'VGC', 'LORCANA', 'BSS', 'OP', 'SWU', 'PGO', 'GUNDAM', 'DCG', 'other', 'PTCG'] as const;
 
 // Define tournament parameters schema with ZodRawShape
 const tournamentsParamsSchema = z.object({
-  game: GAME_ENUM.nullish().describe("The game to filter by."),
+  game: z.enum(GAMES).optional().default('VGC').describe("The game to filter by."),
   format: z.string().nullish().describe("The format to filter by."),
   organizerId: z.string().nullish().describe("The organizer to filter by."),
   limit: z.union([z.string(), z.number()]).nullable().optional().describe("Number of tournaments to be returned."),
@@ -134,7 +134,6 @@ server.tool(
   tournamentsParamsSchema.shape,
   async ({ game, format, organizerId, limit, page }, extra) => {
     try {
-      console.log("game", game);
       // Prepare query parameters for the API request
       const queryParams: Record<string, unknown> = {};
       if (game) queryParams.game = game;
@@ -145,18 +144,10 @@ server.tool(
       
       const tournaments = await limitlessRequest("tournaments", queryParams);
       
-      // Construct the title based on the query parameters
-      let title = "Limitless Tournaments";
-      if (game) title += ` - ${game}`;
-      if (format) title += ` (${format} format)`;
-      if (organizerId) title += ` by organizer ${organizerId}`;
-      if (limit) title += ` (limited to ${limit})`;
-      if (page) title += ` - Page ${page}`;
-      
       return {
         content: [{ 
           type: "text", 
-          text: `# ${title}\n\n${JSON.stringify(tournaments, null, 2)}` 
+          text: JSON.stringify(tournaments)
         }]
       };
     } catch (error) {
@@ -183,7 +174,7 @@ server.tool(
       return {
         content: [{ 
           type: "text", 
-          text: `# Tournament: ${tournament.name || id}\n\n${JSON.stringify(tournament, null, 2)}` 
+          text: JSON.stringify(tournament)
         }]
       };
     } catch (error) {
@@ -250,7 +241,7 @@ server.tool(
       return {
         content: [{ 
           type: "text", 
-          text: `# Tournament Standings\n\n${JSON.stringify(standings, null, 2)}` 
+          text: JSON.stringify(standings)
         }]
       };
     } catch (error) {
@@ -277,7 +268,7 @@ server.tool(
       return {
         content: [{ 
           type: "text", 
-          text: `# Tournament Pairings\n\n${JSON.stringify(pairings, null, 2)}` 
+          text: JSON.stringify(pairings)
         }]
       };
     } catch (error) {
