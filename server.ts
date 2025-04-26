@@ -29,7 +29,7 @@ const server = new McpServer({
   name: "LimitlessTCG",
   version: "1.0.0",
   description: "Access Limitless TCG tournament data via MCP",
-  instructions: "For all of your queries, please default to using vgc as the game unless explicitly asked for information from other games."
+  instructions: "For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games."
 });
 
 // Get API key
@@ -92,13 +92,15 @@ async function limitlessRequest(endpoint: string, params: Record<string, unknown
   }
 }
 
+const GAME_ENUM = z.enum(['DBS', 'FW', 'POCKET', 'VGC', 'LORCANA', 'BSS', 'OP', 'SWU', 'PGO', 'GUNDAM', 'DCG', 'other', 'PTCG']);
+
 // Define tournament parameters schema with ZodRawShape
 const tournamentsParamsSchema = z.object({
-  game: z.string().optional().nullable().describe("The game to filter by. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game."),
-  format: z.string().optional().nullable().describe("The format to filter by."),
-  organizerId: z.string().optional().nullable().describe("The organizer to filter by."),
-  limit: z.union([z.string(), z.number()]).optional().nullable().describe("Number of tournaments to be returned."),
-  page: z.union([z.string(), z.number()]).optional().nullable().describe("Used for pagination.")
+  game: GAME_ENUM.nullish().describe("The game to filter by."),
+  format: z.string().nullish().describe("The format to filter by."),
+  organizerId: z.string().nullish().describe("The organizer to filter by."),
+  limit: z.union([z.string(), z.number()]).nullable().optional().describe("Number of tournaments to be returned."),
+  page: z.union([z.string(), z.number()]).nullable().optional().describe("Used for pagination.")
 });
 
 // Define tournament ID parameter schema with ZodRawShape
@@ -107,20 +109,22 @@ const tournamentIdParamsSchema = z.object({
 });
 
 const getTournamentsDesc = `
-  Retrieve a list of tournaments with optional filtering by game, format, organizer, etc. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
+  Retrieve a list of tournaments with optional filtering by game, format, organizer, etc.
 
   It can accept the following parameters:
-  - game (str, optional): The game to filter by. Default to vgc as the game. Pass ptcg as the game if the user explicitly requests for TCG tournaments.
+  - game (str, optional): The game to filter by.
   - format (str, optional): The format to filter by.
   - organizerId (str, optional): The organizer to filter by.
   - limit (str | int, optional): Number of tournaments to be returned.
   - page (str | int, optional): Used for pagination.
 
+  Default to VGC as the game. Pass PTCG as the game if the user explicitly requests for TCG tournaments.
+
   Try to find tournaments whose names are exact or similar to the user's input, even if the match is not exact.
 
   If the user requests for a specific tournament, and you can't find it, please attempt to find the tournament on later pages without explicitly being asked by the user. Don't go past tournaments that happened more than a month ago unless explicitly asked by the user.
 
-  If the user requests for upcoming tournaments, please let them know that you only have access to tournaments that have just completed.
+  If the user requests for upcoming tournaments, please let them know that you only have access to tournaments that have just completed. Then provide them with results immediately.
 `;
 
 // Tool 1: Get Tournament List
@@ -130,6 +134,7 @@ server.tool(
   tournamentsParamsSchema.shape,
   async ({ game, format, organizerId, limit, page }, extra) => {
     try {
+      console.log("game", game);
       // Prepare query parameters for the API request
       const queryParams: Record<string, unknown> = {};
       if (game) queryParams.game = game;
