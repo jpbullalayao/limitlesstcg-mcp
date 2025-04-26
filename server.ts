@@ -32,7 +32,7 @@ const server = new McpServer({
 });
 
 // Get API key
-const apiKey = getApiKey() || "dddc5b23b5bae0a87ca800c20d336022";
+const apiKey = getApiKey();
 // if (!apiKey) {
 //   console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
 //   process.exit(1);
@@ -106,11 +106,20 @@ const tournamentIdParamsSchema = z.object({
 });
 
 const getTournamentsDesc = `
-Retrieve a list of tournaments with optional filtering by game, format, organizer, etc. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
+  Retrieve a list of tournaments with optional filtering by game, format, organizer, etc. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
 
-Please don't default to exact string matching when looking for tournaments. Instead, use the best string matching you can do.
+  It can accept the following parameters:
+  - game (str, optional): The game to filter by. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
+  - format (str, optional): The format to filter by.
+  - organizerId (str, optional): The organizer to filter by.
+  - limit (str | int, optional): Number of tournaments to be returned.
+  - page (str | int, optional): Used for pagination.
 
-If the user requests for a specific tournament, and you can't find it, please attempt to find the tournament on later pages without explicitly being asked by the user. Don't go past tournaments that happened more than a month ago unless explicitly asked by the user.
+  Try to find tournaments whose names are exact or similar to the user's input, even if the match is not exact.
+
+  If the user requests for a specific tournament, and you can't find it, please attempt to find the tournament on later pages without explicitly being asked by the user. Don't go past tournaments that happened more than a month ago unless explicitly asked by the user.
+
+  If the user requests for upcoming tournaments, please let them know that you only have access to tournaments that have just completed.
 `;
 
 // Tool 1: Get Tournament List
@@ -184,45 +193,43 @@ server.tool(
 );
 
 const tournamentStandingsDesc = `
-Retrieve standings for a specific tournament. If anyone asks about specific pokemon usage, you can find that info in the decklists. 
-If anyone asks about "restricted"s, they're referring to any of the following pokemon:
-- Mewtwo
-- Lugia
-- Ho-Oh
-- Kyogre
-- Groudon
-- Rayquaza
-- Dialga
-- Dialga (Origin Forme)
-- Palkia
-- Palkia (Origin Forme)
-- Giratina (Altered Forme)
-- Giratina (Origin Forme)
-- Reshiram
-- Zekrom
-- Kyurem
-- Kyurem (White Kyurem)
-- Kyurem (Black Kyurem)
-- Cosmog
-- Cosmoem
-- Solgaleo
-- Lunala
-- Necrozma
-- Necrozma (Dusk Mane)
-- Necrozma (Dawn Wings)
-- Zacian
-- Zamazenta
-- Eternatus
-- Calyrex
-- Calyrex (Ice Rider)
-- Calyrex (Shadow Rider)
-- Koraidon
-- Miraidon
-- Terapagos
+  Retrieve standings for a specific tournament. If anyone asks about specific pokemon usage, you can find that info in the decklists. 
+  If anyone asks about "restricted"s, they're referring to any of the following pokemon:
+  - Mewtwo
+  - Lugia
+  - Ho-Oh
+  - Kyogre
+  - Groudon
+  - Rayquaza
+  - Dialga
+  - Dialga (Origin Forme)
+  - Palkia
+  - Palkia (Origin Forme)
+  - Giratina (Altered Forme)
+  - Giratina (Origin Forme)
+  - Reshiram
+  - Zekrom
+  - Kyurem
+  - Kyurem (White Kyurem)
+  - Kyurem (Black Kyurem)
+  - Cosmog
+  - Cosmoem
+  - Solgaleo
+  - Lunala
+  - Necrozma
+  - Necrozma (Dusk Mane)
+  - Necrozma (Dawn Wings)
+  - Zacian
+  - Zamazenta
+  - Eternatus
+  - Calyrex
+  - Calyrex (Ice Rider)
+  - Calyrex (Shadow Rider)
+  - Koraidon
+  - Miraidon
+  - Terapagos
 
-Please don't default to exact string matching when looking for restricted pokemon. It is guaranteed that not all of these Pokemon names map 1-to-1 with the pokemon names returned by the Limitless API. Just use the best string matching you can do.
-
-If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
+  Try to find restricted pokemon whose names are exact or similar to the user's input, even if the match is not exact. Keep in mind it is guaranteed that not all of these Pokemon names map 1-to-1 with the pokemon names returned by the Limitless API.
 `;
 
 // Tool 3: Get Tournament Standings
