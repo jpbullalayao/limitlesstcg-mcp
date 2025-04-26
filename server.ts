@@ -28,15 +28,16 @@ const API_BASE_URL = "https://play.limitlesstcg.com/api";
 const server = new McpServer({
   name: "LimitlessTCG",
   version: "1.0.0",
-  description: "Access Limitless TCG tournament data via MCP"
+  description: "Access Limitless TCG tournament data via MCP",
+  instructions: "For all of your queries, please default to using vgc as the game unless explicitly asked for information from other games."
 });
 
 // Get API key
 const apiKey = getApiKey();
-// if (!apiKey) {
-//   console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
-//   process.exit(1);
-// }
+if (!apiKey) {
+  console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
+  process.exit(1);
+}
 
 // At this point, we know apiKey is not null
 const validApiKey = apiKey as string;
@@ -109,7 +110,7 @@ const getTournamentsDesc = `
   Retrieve a list of tournaments with optional filtering by game, format, organizer, etc. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
 
   It can accept the following parameters:
-  - game (str, optional): The game to filter by. If the user requests for VGC tournaments, pass vgc as the game. If the user requests for TCG tournaments, pass tcg as the game.
+  - game (str, optional): The game to filter by. Default to vgc as the game. Pass ptcg as the game if the user explicitly requests for TCG tournaments.
   - format (str, optional): The format to filter by.
   - organizerId (str, optional): The organizer to filter by.
   - limit (str | int, optional): Number of tournaments to be returned.
