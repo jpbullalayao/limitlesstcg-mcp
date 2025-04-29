@@ -33,7 +33,7 @@ const INSTRUCTIONS = `
   - get_tournament_standings
   - get_tournament_pairings
 
-  For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games. Also, be concise with your responses. DO NOT ask the user more questions after you provide your answer. You are a Q&A assistant, not necessarily a chatbot unless the user's prompts require back-to-back discussion.
+  For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games. Also, be concise with your responses. PLEASE DO NOT ask the user more questions after you provide your answer. You are a Q&A assistant, not necessarily a chatbot unless the user's prompts require back-to-back discussion.
 `;
 
 const server = new McpServer({
@@ -98,7 +98,7 @@ const tournamentIdParamsSchema = z.object({
   id: z.string().describe("The tournament ID.")
 });
 
-const getTournamentsDesc = `
+const GET_TOURNAMENTS_DESC = `
   Retrieve a list of tournaments with optional filtering by game, format, organizer, etc.
 
   It can accept the following parameters:
@@ -119,7 +119,7 @@ const getTournamentsDesc = `
 
 server.tool(
   "get_tournaments", 
-  getTournamentsDesc,
+  GET_TOURNAMENTS_DESC,
   tournamentsParamsSchema.shape,
   async ({ game, format, organizerId, limit, page }, extra) => {
     try {
@@ -177,7 +177,7 @@ server.tool(
   }
 );
 
-const tournamentStandingsDesc = `
+const TOURNAMENT_STANDINGS_DESC = `
   Retrieve standings for a specific tournament. If anyone asks about specific pokemon usage, you can find that info in the decklists. 
   If anyone asks about "restricted"s, they're referring to any of the following pokemon:
   - Mewtwo
@@ -221,10 +221,9 @@ const tournamentStandingsDesc = `
   Try to find restricted pokemon whose names are exact or similar to the user's input, even if the match is not exact. Keep in mind it is guaranteed that not all of these Pokemon names map 1-to-1 with the pokemon names returned by the Limitless API.
 `;
 
-// Tool 3: Get Tournament Standings
 server.tool(
   "get_tournament_standings",
-  tournamentStandingsDesc,
+  TOURNAMENT_STANDINGS_DESC,
   tournamentIdParamsSchema.shape,
   async ({ id }, extra) => {
     try {
@@ -248,7 +247,6 @@ server.tool(
   }
 );
 
-// Tool 4: Get Tournament Pairings
 server.tool(
   "get_tournament_pairings",
   "Retrieve match pairings for a specific tournament",
