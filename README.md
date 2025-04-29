@@ -4,7 +4,7 @@ The [Limitless TCG](https://limitlesstcg.com/) [Model Context Protocol](https://
 
 ## Setup
 
-To run the Stripe MCP server using npx, use the following command:
+To run the Limitless TCG MCP server using npx, use the following command:
 
 ```
 $ npx limitlesstcg-mcp api-key=<LIMITLESS_API_KEY_HERE>
