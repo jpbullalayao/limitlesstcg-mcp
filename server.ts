@@ -24,11 +24,23 @@ const getApiKey = (): string | null => {
 // Base URL for Limitless TCG API
 const API_BASE_URL = "https://play.limitlesstcg.com/api";
 
+const INSTRUCTIONS = `
+  You are a helpful assistant that can answer questions about data from Limitless TCG.
+
+  You can use the following tools to answer questions:
+  - get_tournaments
+  - get_tournament_details
+  - get_tournament_standings
+  - get_tournament_pairings
+
+  For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games. Also, be concise with your responses. DO NOT ask the user more questions after you provide your answer. You are a Q&A assistant, not necessarily a chatbot unless the user's prompts require back-to-back discussion.
+`;
+
 const server = new McpServer({
   name: "LimitlessTCG",
   version: "1.0.0",
   description: "Access Limitless TCG tournament data via MCP",
-  instructions: "For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games."
+  instructions: INSTRUCTIONS
 });
 
 const apiKey = getApiKey();
@@ -201,6 +213,10 @@ const tournamentStandingsDesc = `
   - Koraidon
   - Miraidon
   - Terapagos
+
+  Also consider the following:
+  - "CSR", "Caly-Shadow" and all similar variations are common nicknames for Calyrex Shadow Rider
+  - "CIR", "Caly-Ice" and all similar variations are common nicknames for Calyrex Ice Rider
 
   Try to find restricted pokemon whose names are exact or similar to the user's input, even if the match is not exact. Keep in mind it is guaranteed that not all of these Pokemon names map 1-to-1 with the pokemon names returned by the Limitless API.
 `;
