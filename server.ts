@@ -220,6 +220,8 @@ const TOURNAMENT_STANDINGS_DESC = `
   - "CSR", "Caly-Shadow" and all similar variations are common nicknames for Calyrex Shadow Rider
   - "CIR", "Caly-Ice" and all similar variations are common nicknames for Calyrex Ice Rider
 
+  When asked about restricted "duo"s, "pair"s, or similar variations, please ensure that you are analyzing each team and understanding exactly which restricted pokemon a player is using, before formulating responses. For example, a person cannot be using two different pairs at the same time in the same tournament like Lunala & Koraidon, and Calyrex Shadow Rider & Koraidon.
+
   Try to find restricted pokemon whose names are exact or similar to the user's input, even if the match is not exact. Keep in mind it is guaranteed that not all of these Pokemon names map 1-to-1 with the pokemon names returned by the Limitless API.
 `;
 
