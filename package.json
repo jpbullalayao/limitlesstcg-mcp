@@ -1,6 +1,6 @@
 {
   "name": "limitlesstcg-mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "MCP server for accessing Limitless TCG API",
   "main": "dist/server.js",
   "type": "module",
