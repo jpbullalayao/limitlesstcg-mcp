@@ -24,7 +24,6 @@ const getApiKey = (): string | null => {
 // Base URL for Limitless TCG API
 const API_BASE_URL = "https://play.limitlesstcg.com/api";
 
-// Create an MCP server
 const server = new McpServer({
   name: "LimitlessTCG",
   version: "1.0.0",
@@ -32,7 +31,6 @@ const server = new McpServer({
   instructions: "For all of your queries, please default to using VGC as the game unless explicitly asked for information from other games."
 });
 
-// Get API key
 const apiKey = getApiKey();
 if (!apiKey) {
   console.error("ERROR: No API key provided. Please set LIMITLESS_API_KEY environment variable or provide api-key=<API_KEY_HERE> argument.");
@@ -43,10 +41,8 @@ if (!apiKey) {
 const validApiKey = apiKey as string;
 
 // Helper function to make authenticated API requests
-async function limitlessRequest(endpoint: string, params: Record<string, unknown> = {}, useHeaderAuth = false) {
-  // Remove leading slash if present for consistency
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-  const url = new URL(`${API_BASE_URL}/${cleanEndpoint}`);
+const limitlessRequest = async (endpoint: string, params: Record<string, unknown> = {}) => {
+  const url = new URL(`${API_BASE_URL}/${endpoint}`);
   
   // Add any query parameters
   for (const [key, value] of Object.entries(params)) {
@@ -56,19 +52,10 @@ async function limitlessRequest(endpoint: string, params: Record<string, unknown
   }
 
   // Set up request headers
-  const headers: Record<string, string> = {};
-  
-  // Add API key either as query parameter or HTTP header based on preference
-  if (useHeaderAuth) {
-    // Use HTTP header authentication
-    headers['X-Access-Key'] = validApiKey;
-  } else {
-    // Use query parameter authentication
-    url.searchParams.append("key", validApiKey);
-  }
+  const headers: Record<string, string> = {
+    'X-Access-Key': validApiKey
+  };
 
-  // process.stderr.write(`Making request to: ${url.toString()}\n`);
-  
   try {
     const response = await fetch(url.toString(), { headers });
     
@@ -81,20 +68,12 @@ async function limitlessRequest(endpoint: string, params: Record<string, unknown
     return data;
   } catch (error) {
     console.error(`Error fetching from Limitless API: ${error}`);
-    
-    // If using query param auth failed, try with header auth
-    if (!useHeaderAuth) {
-      console.log("Retrying with header authentication...");
-      return limitlessRequest(endpoint, params, true);
-    }
-    
     throw error;
   }
 }
 
 const GAMES = ['DBS', 'FW', 'POCKET', 'VGC', 'LORCANA', 'BSS', 'OP', 'SWU', 'PGO', 'GUNDAM', 'DCG', 'other', 'PTCG'] as const;
 
-// Define tournament parameters schema with ZodRawShape
 const tournamentsParamsSchema = z.object({
   game: z.enum(GAMES).optional().default('VGC').describe("The game to filter by."),
   format: z.string().nullish().describe("The format to filter by."),
@@ -103,7 +82,6 @@ const tournamentsParamsSchema = z.object({
   page: z.union([z.string(), z.number()]).nullable().optional().describe("Used for pagination.")
 });
 
-// Define tournament ID parameter schema with ZodRawShape
 const tournamentIdParamsSchema = z.object({
   id: z.string().describe("The tournament ID.")
 });
@@ -127,7 +105,6 @@ const getTournamentsDesc = `
   If the user requests for upcoming tournaments, please let them know that you only have access to tournaments that have just completed. Then provide them with results immediately.
 `;
 
-// Tool 1: Get Tournament List
 server.tool(
   "get_tournaments", 
   getTournamentsDesc,
@@ -162,7 +139,6 @@ server.tool(
   }
 );
 
-// Tool 2: Get Tournament Details
 server.tool(
   "get_tournament_details",
   "Retrieve detailed information about a specific tournament",
